@@ -1,5 +1,17 @@
 from django.shortcuts import render
 from .models import Buyer, Game
+from .forms import UserRegisterForm
+from .models import Buyer
+
+def index(request):
+    return render(request, 'task1/index.html')
+
+def shop(request):
+    games = Game.objects.all()
+    return render(request, 'task1/shop.html', {'games': games})
+
+def cart(request):
+    return render(request, 'task1/cart.html')
 
 def create_buyers_and_games(request):
     # Создание покупателей
@@ -18,3 +30,28 @@ def create_buyers_and_games(request):
     game3.buyer.set([buyer1, buyer2])
 
     return render(request, 'task1/success.html')
+
+def sign_up_by_django(request):
+    info = {}
+    if request.method == 'POST':
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            repeat_password = form.cleaned_data['repeat_password']
+            age = form.cleaned_data['age']
+
+            if password != repeat_password:
+                info['error'] = 'Пароли не совпадают'
+            elif age < 18:
+                info['error'] = 'Вы должны быть старше 18'
+            elif Buyer.objects.filter(name=username).exists():
+                info['error'] = 'Пользователь уже существует'
+            else:
+                Buyer.objects.create(name=username, balance=0.00, age=age)
+                return render(request, 'task1/registration_success.html', {'username': username})
+    else:
+        form = UserRegisterForm()
+
+    info['form'] = form
+    return render(request, 'task1/registration_page.html', info)
