@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список постов</title>
+    <style>
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination a, .pagination span {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            text-decoration: none;
+            color: #333;
+        }
+        .pagination .current {
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Список постов</h1>
+    <ul>
+        {% for post in page_obj %}
+            <li>{{ post.title }} - {{ post.pub_date }}</li>
+        {% endfor %}
+    </ul>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1&per_page={{ per_page }}">&laquo; первая</a>
+                <a href="?page={{ page_obj.previous_page_number }}&per_page={{ per_page }}">предыдущая</a>
+            {% endif %}
+
+            <span class="current">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&per_page={{ per_page }}">следующая</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}&per_page={{ per_page }}">последняя &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+    <div>
+        <label for="per_page">Элементов на странице:</label>
+        <select id="per_page" name="per_page" onchange="changePerPage(this.value)">
+            <option value="5" {% if per_page|add:"0" == 5 %}selected{% endif %}>5</option>
+            <option value="10" {% if per_page|add:"0" == 10 %}selected{% endif %}>10</option>
+            <option value="20" {% if per_page|add:"0" == 20 %}selected{% endif %}>20</option>
+            <option value="50" {% if per_page|add:"0" == 50 %}selected{% endif %}>50</option>
+        </select>
+    </div>
+    <script>
+        function changePerPage(value) {
+            window.location.href = `?per_page=${value}`;
+        }
+    </script>
+</body>
+</html>
